@@ -29,7 +29,7 @@ class VideoFeed {
             this.$http.get(url).then(res => res.data).
                 then(
                     res => {
-                        this.items = res.items;
+                        this.items = res.items.filter(item => item.type === "video");
                         this.error = undefined;
                         this.status = "success";
                     },
@@ -56,7 +56,7 @@ export default {
             
             <!-- SUCCESS -->
             <div ng-switch-when="success">
-                <tk-video-feed-item ng-repeat="item in $videoFeed.items track by item.videoId"
+                <tk-video-feed-item ng-repeat="item in $videoFeed.items"
                                     item="item"/>
             </div>
             
