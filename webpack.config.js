@@ -9,7 +9,7 @@ module.exports = {
         path: path.resolve(__dirname, "docs/assets"),
         filename: "video-feed.js",
         sourceMapFilename: "video-feed.js.map",
-        publicPath: "/assets/"
+        publicPath: "assets/"
     },
     devtool: "source-map",
     devServer: {
