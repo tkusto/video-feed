@@ -7,14 +7,7 @@ const SOURCES = {
     },
     "facebook": {
         getUrl: ({ videoId }) => `https://www.facebook.com/video.php?v=${videoId}`,
-        getTitle: ({ title }) => title,
-        init: () => setTimeout(() => {
-            try {
-                FB.XFBML.parse();
-            } catch (e) {
-                console.error(e);
-            }
-        }, 0)
+        getTitle: ({ title }) => title
     },
     "url": {
         getUrl: ({ url }) => url,
@@ -38,9 +31,6 @@ class VideoFeedItem {
                 const { getUrl, getTitle, template, init } = SOURCES[source];
                 this.videoUrl = this.$sce.trustAsResourceUrl(getUrl(item.currentValue));
                 this.videoTitle = getTitle(item.currentValue);
-                if (typeof init === "function") {
-                    init(item);
-                }
             }
         }
     }    
@@ -60,14 +50,11 @@ export default {
             </header>
             <!-- YOUTUBE -->
             <div class="item-video" ng-switch-when="youtube">
-                <tk-yt-player video-id="{{$videoFeedItem.item.videoId}}" width="480"/>
+                <tk-yt-player ng-attr-video-id="{{$videoFeedItem.item.videoId}}" width="480"/>
             </div>
             <!-- FACEBOOK -->
             <div class="item-video" ng-switch-when="facebook">
-                <div class="fb-video"
-                        ng-attr-data-href="{{$videoFeedItem.videoUrl}}"
-                        data-width="480"
-                        data-allowfullscreen="true"></div>
+                <tk-fb-player ng-attr-video-id="{{$videoFeedItem.item.videoId}}" width="480"/>
             </div>
             <!-- VIDEO URL -->
             <div class="item-video" ng-switch-when="url">

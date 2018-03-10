@@ -23,8 +23,8 @@ class YTPlayer {
             const readyDeferred = this.$q.defer();
             this.$element.html(`<div id="${this.playerId}"></div>`);
             this.player = new YT.Player(this.playerId, {
-                width: Math.min(480, this.width),
-                height: Math.min(270, Math.ceil(this.width / 16 * 9)),
+                width: Math.max(480, this.width),
+                height: Math.max(270, Math.ceil(this.width / 16 * 9)),
                 videoId,
                 events: {
                     onReady: () => { readyDeferred.resolve(); }
