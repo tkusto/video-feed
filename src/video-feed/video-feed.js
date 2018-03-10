@@ -66,7 +66,8 @@ export default {
                             ng-value="::source"
                             ng-bind="::source"></option>
                 </select>
-                <tk-video-feed-item ng-repeat="item in ($videoFeed.items | filter:{ source: $videoFeed.sourceFilter })"
+                <tk-video-feed-item ng-repeat="item in $videoFeed.items"
+                                    ng-show="!$videoFeed.sourceFilter || item.source === $videoFeed.sourceFilter"
                                     item="item"/>
             </div>
             
