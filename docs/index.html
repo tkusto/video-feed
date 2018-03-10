@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Video Feed</title>
+<link href="/assets/video-feed.css?fe0a9df84595e8c1294b" rel="stylesheet"></head>
+<body>
+<header>
+    <nav class="page-nav">
+        <a class="page-nav-title" href="/">VIDEO FEED</a>
+    </nav>
+</header>
+<main class="page-content">
+    <tk-video-feed src="https://cdn.playbuzz.com/content/feed/items"/>
+</main>
+
+<!-- Facebook SDK -->
+<script id="facebook-jssdk" defer async src="//connect.facebook.net/en_US/sdk.js"></script>
+<script type="text/javascript">
+window.fbAsyncInit = function () {
+    FB.init({
+        xfbml: true,
+        version: "v2.5"
+    });
+};
+</script>
+<script type="text/javascript" src="/assets/video-feed.js?fe0a9df84595e8c1294b"></script></body>
+</html>

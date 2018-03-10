@@ -6,7 +6,7 @@ const extractCss = new ExtractTextWebpackPlugin("video-feed.css");
 module.exports = {
     entry: ["./src/index.js", "./src/video-feed.css"],
     output: {
-        path: path.resolve(__dirname, "public/assets"),
+        path: path.resolve(__dirname, "docs/assets"),
         filename: "video-feed.js",
         sourceMapFilename: "video-feed.js.map",
         publicPath: "/assets/"
@@ -40,7 +40,7 @@ module.exports = {
         extractCss,
         new HtmlWebpackPlugin({
             title: "Video Feed",
-            filename: path.resolve(__dirname, "public/index.html"),
+            filename: path.resolve(__dirname, "docs/index.html"),
             template: path.resolve(__dirname, "src/index.html"),
             hash: true
         })
