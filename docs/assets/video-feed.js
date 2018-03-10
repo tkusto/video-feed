@@ -34762,7 +34762,7 @@ function fitToRange(num) {
     }, undefined);
     if (range) {
         var integer = Math.floor(num / range.base);
-        var fraction = Math.round((num - integer) / range.base * 10);
+        var fraction = Math.round((num - integer * range.base) / range.base * 10);
         return fraction > 0 ? integer + '.' + fraction + range.suffix : '' + integer + range.suffix;
     } else {
         return num.toString(10);
