@@ -13,7 +13,7 @@ module.exports = {
     },
     devtool: "source-map",
     devServer: {
-        contentBase: path.resolve(__dirname, "public"),
+        contentBase: path.resolve(__dirname, "docs"),
         hot: false,
         publicPath: "/"
     },
