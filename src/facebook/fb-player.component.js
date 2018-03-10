@@ -11,6 +11,13 @@ class FbPlayer {
         this.tkFbSdk = tkFbSdk;
         this.playerId = `tk-fb-player-${$scope.$id}`;
         this.width = MIN_WIDTH;
+        this.handlePlayerInstance = this.handlePlayerInstance.bind(this);
+    }
+
+    $onInit() {
+        this.tkFbSdk.ready.then(FB => {
+            FB.Event.subscribe("xfbml.ready", this.handlePlayerInstance);
+        });
     }
 
     $onChanges({ videoId, _width }) {
@@ -24,14 +31,23 @@ class FbPlayer {
         }
     }
 
+    $onDestroy() {
+        this.destroyPlayer();
+        this.tkFbSdk.ready.then(FB => {
+            FB.Event.unsubscribe("xfbml.ready", this.handlePlayerInstance);
+        });
+    }
+
     initPlayer(videoId) {
+        this.destroyPlayer();
         return this.$q((resolve, reject) => {
             const document = this.$document[0];
             const fbVideo = element(document.createElement("div"));
             fbVideo.addClass("fb-video").
+                attr("id", this.playerId).
                 attr("data-href", `https://www.facebook.com/video.php?v=${videoId}`).
                 attr("data-width", this.width);
-            this.$element.empty().append(fbVideo);
+            this.$element.append(fbVideo);
             // we need wait till the digest is done
             setTimeout(() => {
                 this.tkFbSdk.ready.then(FB => {
@@ -41,6 +57,23 @@ class FbPlayer {
                 });
             }, 0);
         });
+    }
+
+    destroyPlayer() {
+        if (this.playerErrorHandler) {
+            this.playerErrorHandler.release();
+            this.playerErrorHandler = undefined;
+            this.error = undefined;
+            this.$element.empty();
+        }
+    }
+
+    handlePlayerInstance(msg) {
+        if (msg.type === "video" && msg.id === this.playerId) {
+            this.playerErrorHandler = msg.instance.subscribe("error", err => {
+                this.error = err;
+            });
+        }
     }
 }
 

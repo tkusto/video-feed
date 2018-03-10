@@ -48,7 +48,6 @@ tk-video-feed-item {
 tk-video-feed-item .item-header {
     display: flex;
     justify-content: space-between;
-    background: #fafafa;
 }
 
 tk-video-feed-item .item-title,
