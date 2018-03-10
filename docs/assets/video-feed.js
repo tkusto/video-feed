@@ -76,7 +76,7 @@ module.exports = angular;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(2);
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(12);
 
 
 /***/ }),
@@ -34477,15 +34477,19 @@ var _angular = __webpack_require__(0);
 
 var _angular2 = _interopRequireDefault(_angular);
 
-var _videoFeed = __webpack_require__(5);
+var _youtube = __webpack_require__(5);
+
+var _youtube2 = _interopRequireDefault(_youtube);
+
+var _videoFeed = __webpack_require__(8);
 
 var _videoFeed2 = _interopRequireDefault(_videoFeed);
 
-var _videoFeedItem = __webpack_require__(7);
+var _videoFeedItem = __webpack_require__(10);
 
 var _videoFeedItem2 = _interopRequireDefault(_videoFeedItem);
 
-var _videoViewsCount = __webpack_require__(8);
+var _videoViewsCount = __webpack_require__(11);
 
 var _videoViewsCount2 = _interopRequireDefault(_videoViewsCount);
 
@@ -34495,7 +34499,7 @@ var MODULE_NAME = "tk.VideoFeed";
 exports.default = MODULE_NAME;
 
 
-_angular2.default.module(MODULE_NAME, []).run(_videoFeedItem.registerTemplates).filter("tkVideoViewsCount", _videoViewsCount2.default).component("tkVideoFeed", _videoFeed2.default).component("tkVideoFeedItem", _videoFeedItem2.default);
+_angular2.default.module(MODULE_NAME, [_youtube2.default]).filter("tkVideoViewsCount", _videoViewsCount2.default).component("tkVideoFeed", _videoFeed2.default).component("tkVideoFeedItem", _videoFeedItem2.default);
 
 /***/ }),
 /* 5 */
@@ -34508,9 +34512,182 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _angular = __webpack_require__(0);
+
+var _angular2 = _interopRequireDefault(_angular);
+
+var _ytIframeApi = __webpack_require__(6);
+
+var _ytIframeApi2 = _interopRequireDefault(_ytIframeApi);
+
+var _ytPlayer = __webpack_require__(7);
+
+var _ytPlayer2 = _interopRequireDefault(_ytPlayer);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MODULE_NAME = "tk.YouTube";
+exports.default = MODULE_NAME;
+
+
+_angular2.default.module(MODULE_NAME, []).service("tkYouTubeIframeApi", _ytIframeApi2.default).component("tkYtPlayer", _ytPlayer2.default);
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _utils = __webpack_require__(6);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var YT_IFRAME_API_SRC = "https://www.youtube.com/iframe_api";
+
+function loadApi(document) {
+    var script = document.createElement("script");
+    var firstScriptTag = document.scripts[0];
+    script.src = YT_IFRAME_API_SRC;
+    firstScriptTag.parentNode.insertBefore(script, firstScriptTag);
+}
+
+var YouTubeIframeApiService = function () {
+    _createClass(YouTubeIframeApiService, null, [{
+        key: "$inject",
+        get: function get() {
+            return ["$window", "$document", "$q"];
+        }
+    }]);
+
+    function YouTubeIframeApiService($window, $document, $q) {
+        _classCallCheck(this, YouTubeIframeApiService);
+
+        var readyDeferred = $q.defer();
+        $window.onYouTubeIframeAPIReady = function () {
+            readyDeferred.resolve($window.YT);
+        };
+        this.ready = readyDeferred.promise;
+        if (typeof Object.freeze === "function") {
+            Object.freeze(this);
+        }
+        loadApi($document[0]);
+    }
+
+    return YouTubeIframeApiService;
+}();
+
+exports.default = YouTubeIframeApiService;
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var YTPlayer = function () {
+    _createClass(YTPlayer, null, [{
+        key: "$inject",
+        get: function get() {
+            return ["$scope", "$element", "$q", "tkYouTubeIframeApi"];
+        }
+    }]);
+
+    function YTPlayer($scope, $element, $q, tkYouTubeIframeApi) {
+        _classCallCheck(this, YTPlayer);
+
+        this.$element = $element;
+        this.$q = $q;
+        this.tkYouTubeIframeApi = tkYouTubeIframeApi;
+        this.playerId = "tk-yt-player-" + $scope.$id;
+    }
+
+    _createClass(YTPlayer, [{
+        key: "$onChanges",
+        value: function $onChanges(_ref) {
+            var videoId = _ref.videoId;
+
+            if (videoId && videoId.currentValue) {
+                this.destroyPlayer();
+                this.initPlayer(videoId.currentValue);
+            }
+        }
+    }, {
+        key: "$onDestroy",
+        value: function $onDestroy() {
+            this.destroyPlayer();
+        }
+    }, {
+        key: "initPlayer",
+        value: function initPlayer(videoId) {
+            var _this = this;
+
+            return this.tkYouTubeIframeApi.ready.then(function (YT) {
+                var readyDeferred = _this.$q.defer();
+                _this.$element.html("<div id=\"" + _this.playerId + "\"></div>");
+                _this.player = new YT.Player(_this.playerId, {
+                    width: Math.min(480, _this.width),
+                    height: Math.min(270, Math.ceil(_this.width / 16 * 9)),
+                    videoId: videoId,
+                    events: {
+                        onReady: function onReady() {
+                            readyDeferred.resolve();
+                        }
+                    }
+                });
+                return readyDeferred.promise;
+            });
+        }
+    }, {
+        key: "destroyPlayer",
+        value: function destroyPlayer() {
+            if (this.player) {
+                this.player.destroy();
+                this.player = null;
+            }
+        }
+    }]);
+
+    return YTPlayer;
+}();
+
+exports.default = {
+    bindings: {
+        videoId: "@",
+        width: "<"
+    },
+    controller: YTPlayer,
+    controllerAs: "$ytPlayer",
+    template: ""
+};
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _utils = __webpack_require__(9);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -34587,11 +34764,11 @@ exports.default = {
     },
     controller: VideoFeed,
     controllerAs: "$videoFeed",
-    template: "\n        <div ng-switch=\"$videoFeed.status\">\n            <!-- PENDING -->\n            <div ng-switch-when=\"pending\">Please wait...</div>\n            \n            <!-- SUCCESS -->\n            <div ng-switch-when=\"success\">\n                <select ng-model=\"$videoFeed.sourceFilter\" class=\"source-filter\">\n                    <option ng-value=\"::''\" label=\"Any\" selected>Any</option>\n                    <option ng-repeat=\"source in $videoFeed.sources track by source\"\n                            ng-value=\"::source\"\n                            ng-bind=\"::source\"></option>\n                </select>\n                <tk-video-feed-item ng-repeat=\"item in ($videoFeed.items | filter:{ source: $videoFeed.sourceFilter })\"\n                                    item=\"item\"/>\n            </div>\n            \n            <!-- ERROR -->\n            <div ng-switch-when=\"error\">\n                <p class=\"error\">\n                    <strong>Error {{$videoFeed.error.status}}:</strong>\n                    {{$videoFeed.error.statusText}}\n                </p>\n            </div>\n        </div>\n    "
+    template: "\n        <div ng-switch=\"$videoFeed.status\">\n            <!-- PENDING -->\n            <div ng-switch-when=\"pending\">Please wait...</div>\n            \n            <!-- SUCCESS -->\n            <div ng-switch-when=\"success\">\n                <select ng-model=\"$videoFeed.sourceFilter\" class=\"source-filter\">\n                    <option ng-value=\"::''\" label=\"Any\" selected>Any</option>\n                    <option ng-repeat=\"source in $videoFeed.sources track by source\"\n                            ng-value=\"::source\"\n                            ng-bind=\"::source\"></option>\n                </select>\n                <tk-video-feed-item ng-repeat=\"item in $videoFeed.items\"\n                                    ng-show=\"!$videoFeed.sourceFilter || item.source === $videoFeed.sourceFilter\"\n                                    item=\"item\"/>\n            </div>\n            \n            <!-- ERROR -->\n            <div ng-switch-when=\"error\">\n                <p class=\"error\">\n                    <strong>Error {{$videoFeed.error.status}}:</strong>\n                    {{$videoFeed.error.statusText}}\n                </p>\n            </div>\n        </div>\n    "
 };
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34609,7 +34786,7 @@ function uniq(array) {
 }
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34620,8 +34797,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.registerTemplates = registerTemplates;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -34636,8 +34811,7 @@ var SOURCES = {
         getTitle: function getTitle(_ref2) {
             var title = _ref2.title;
             return title;
-        },
-        template: "tk-video-feed-item/youtube"
+        }
     },
     "facebook": {
         getUrl: function getUrl(_ref3) {
@@ -34648,7 +34822,6 @@ var SOURCES = {
             var title = _ref4.title;
             return title;
         },
-        template: "tk-video-feed-item/facebook",
         init: function init() {
             return setTimeout(function () {
                 try {
@@ -34669,8 +34842,7 @@ var SOURCES = {
 
             var match = url.match(reUrlTitle);
             return match ? match[1] : "Video";
-        },
-        template: "tk-video-feed-item/url"
+        }
     }
 };
 
@@ -34686,7 +34858,6 @@ var VideoFeedItem = function () {
         _classCallCheck(this, VideoFeedItem);
 
         this.$sce = $sce;
-        this.template = undefined;
     }
 
     _createClass(VideoFeedItem, [{
@@ -34704,7 +34875,6 @@ var VideoFeedItem = function () {
                         template = _SOURCES$source.template,
                         init = _SOURCES$source.init;
 
-                    this.template = template;
                     this.videoUrl = this.$sce.trustAsResourceUrl(getUrl(item.currentValue));
                     this.videoTitle = getTitle(item.currentValue);
                     if (typeof init === "function") {
@@ -34718,24 +34888,17 @@ var VideoFeedItem = function () {
     return VideoFeedItem;
 }();
 
-registerTemplates.$inject = ["$templateCache"];
-function registerTemplates($templatesCache) {
-    $templatesCache.put("tk-video-feed-item/youtube", "\n        <iframe ng-src=\"{{$videoFeedItem.videoUrl}}\"\n                width=\"420\"\n                height=\"200\"></iframe>\n    ");
-    $templatesCache.put("tk-video-feed-item/facebook", "\n        <div class=\"fb-video\"\n             ng-attr-data-href=\"{{$videoFeedItem.videoUrl}}\"\n             data-width=\"420\"\n             data-allowfullscreen=\"true\"></div>\n    ");
-    $templatesCache.put("tk-video-feed-item/url", "\n        <video ng-src=\"{{$videoFeedItem.videoUrl}}\"\n               width=\"420\"\n               heihgt=\"315\"\n               controls></video>\n    ");
-}
-
 exports.default = {
     bindings: {
         item: "<"
     },
     controller: VideoFeedItem,
     controllerAs: "$videoFeedItem",
-    template: "\n        <section class=\"item\">\n            <header class=\"item-header\">\n                <span class=\"item-title\" ng-bind=\"$videoFeedItem.videoTitle\"></span>\n                <span class=\"item-views\" ng-bind=\"$videoFeedItem.item.views | tkVideoViewsCount\"></span>\n            </header>\n            <div class=\"item-video\" ng-if=\"$videoFeedItem.template\" ng-include=\"$videoFeedItem.template\"></div>\n        </section>\n    "
+    template: "\n        <section class=\"item\" ng-switch=\"$videoFeedItem.item.source\">\n            <header class=\"item-header\">\n                <span class=\"item-title\" ng-bind=\"$videoFeedItem.videoTitle\"></span>\n                <span class=\"item-views\" ng-bind=\"$videoFeedItem.item.views | tkVideoViewsCount\"></span>\n            </header>\n            <!-- YOUTUBE -->\n            <div class=\"item-video\" ng-switch-when=\"youtube\">\n                <tk-yt-player video-id=\"{{$videoFeedItem.item.videoId}}\" width=\"480\"/>\n            </div>\n            <!-- FACEBOOK -->\n            <div class=\"item-video\" ng-switch-when=\"facebook\">\n                <div class=\"fb-video\"\n                        ng-attr-data-href=\"{{$videoFeedItem.videoUrl}}\"\n                        data-width=\"480\"\n                        data-allowfullscreen=\"true\"></div>\n            </div>\n            <!-- VIDEO URL -->\n            <div class=\"item-video\" ng-switch-when=\"url\">\n                <video ng-src=\"{{$videoFeedItem.videoUrl}}\"\n                        width=\"480\"\n                        heihgt=\"270\"\n                        controls></video>\n            </div>\n        </section>\n    "
 };
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34770,7 +34933,7 @@ function fitToRange(num) {
 }
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
