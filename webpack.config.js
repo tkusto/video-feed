@@ -1,8 +1,10 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ExtractTextWebpackPlugin = require("extract-text-webpack-plugin");
+const extractCss = new ExtractTextWebpackPlugin("video-feed.css");
 
 module.exports = {
-    entry: "./src/index.js",
+    entry: ["./src/index.js", "./src/video-feed.css"],
     output: {
         path: path.resolve(__dirname, "public/assets"),
         filename: "video-feed.js",
@@ -24,10 +26,18 @@ module.exports = {
                 options: {
                     presets: ["env"]
                 }
+            },
+            {
+                test: /\.css$/,
+                include: [path.resolve(__dirname, "src")],
+                use: extractCss.extract({
+                    use: "raw-loader"
+                })
             }
         ]
     },
     plugins: [
+        extractCss,
         new HtmlWebpackPlugin({
             title: "Video Feed",
             filename: path.resolve(__dirname, "public/index.html"),

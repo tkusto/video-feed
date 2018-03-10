@@ -4,7 +4,16 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 <body>
-<tk-video-feed src="https://cdn.playbuzz.com/content/feed/items"/>
+<header>
+    <nav class="page-nav">
+        <a class="page-nav-title" href="/">VIDEO FEED</a>
+    </nav>
+</header>
+<main class="page-content">
+    <tk-video-feed src="https://cdn.playbuzz.com/content/feed/items"/>
+</main>
+
+<!-- Facebook SDK -->
 <script id="facebook-jssdk" defer async src="//connect.facebook.net/en_US/sdk.js"></script>
 <script type="text/javascript">
 window.fbAsyncInit = function () {

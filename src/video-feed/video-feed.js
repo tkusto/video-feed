@@ -1,3 +1,5 @@
+import { uniq } from "../utils";
+
 const NO_SRC_ERROR = {
     status: -1,
     statusText: "Specify source to see a feed"
@@ -10,6 +12,7 @@ class VideoFeed {
         this.status = "error";
         this.items = undefined;
         this.error = NO_SRC_ERROR;
+        this.sources = undefined;
     }
 
     $onChanges({ src }) {
@@ -32,6 +35,7 @@ class VideoFeed {
                         this.items = res.items.filter(item => item.type === "video");
                         this.error = undefined;
                         this.status = "success";
+                        this.sources = uniq(this.items.map(item => item.source))
                     },
                     err => {
                         this.error = err;
@@ -56,7 +60,13 @@ export default {
             
             <!-- SUCCESS -->
             <div ng-switch-when="success">
-                <tk-video-feed-item ng-repeat="item in $videoFeed.items"
+                <select ng-model="$videoFeed.sourceFilter" class="source-filter">
+                    <option ng-value="::''" label="Any" selected>Any</option>
+                    <option ng-repeat="source in $videoFeed.sources track by source"
+                            ng-value="::source"
+                            ng-bind="::source"></option>
+                </select>
+                <tk-video-feed-item ng-repeat="item in ($videoFeed.items | filter:{ source: $videoFeed.sourceFilter })"
                                     item="item"/>
             </div>
             
