@@ -26,7 +26,7 @@ class FbPlayer {
 
     initPlayer(videoId) {
         return this.$q((resolve, reject) => {
-            const [document] = this.$document;
+            const document = this.$document[0];
             const fbVideo = element(document.createElement("div"));
             fbVideo.addClass("fb-video").
                 attr("data-href", `https://www.facebook.com/video.php?v=${videoId}`).
@@ -47,7 +47,7 @@ class FbPlayer {
 export default {
     bindings: {
         videoId: "@",
-        _width: "<"
+        _width: "<width"
     },
     controller: FbPlayer,
     controllerAs: "$fbPlayer"

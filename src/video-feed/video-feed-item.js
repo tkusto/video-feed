@@ -28,8 +28,7 @@ class VideoFeedItem {
         if (item && item.currentValue) {
             const { source } = item.currentValue;
             if (source && SOURCES.hasOwnProperty(source)) {
-                const { getUrl, getTitle, template, init } = SOURCES[source];
-                this.videoUrl = this.$sce.trustAsResourceUrl(getUrl(item.currentValue));
+                const { getTitle } = SOURCES[source];
                 this.videoTitle = getTitle(item.currentValue);
             }
         }
@@ -58,10 +57,7 @@ export default {
             </div>
             <!-- VIDEO URL -->
             <div class="item-video" ng-switch-when="url">
-                <video ng-src="{{$videoFeedItem.videoUrl}}"
-                        width="480"
-                        heihgt="270"
-                        controls></video>
+                <tk-video-player src="$videoFeedItem.item.url" width="480"></video>
             </div>
         </section>
     `
