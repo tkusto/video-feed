@@ -21,10 +21,12 @@ class FbPlayer {
     }
 
     $onChanges({ videoId, _width }) {
-        if (videoId && videoId.currentValue) {
-            this.initPlayer(videoId.currentValue);
-        } else {
-            this.ready = false;
+        if (videoId) {
+            if (videoId.currentValue) {
+                this.initPlayer(videoId.currentValue);
+            } else {
+                this.error = "Facebook video ID is not specified";
+            }
         }
         if (_width) {
             this.width = isNaN(_width.currentValue) ? MIN_WIDTH : Math.max(MIN_WIDTH, _width.currentValue);
