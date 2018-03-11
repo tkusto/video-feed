@@ -25,6 +25,11 @@ html, body {
     padding: 3em;
 }
 
+.error {
+    color: #b33;
+    margin: 1em;
+}
+
 /* Video Feed */
 
 tk-video-feed {

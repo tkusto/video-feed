@@ -43,11 +43,12 @@ class FbPlayer {
         return this.$q((resolve, reject) => {
             const document = this.$document[0];
             const fbVideo = element(document.createElement("div"));
+            const videoContainer = element(this.$element[0].querySelector(".video"));
             fbVideo.addClass("fb-video").
                 attr("id", this.playerId).
                 attr("data-href", `https://www.facebook.com/video.php?v=${videoId}`).
                 attr("data-width", this.width);
-            this.$element.append(fbVideo);
+            videoContainer.empty().append(fbVideo);
             // we need wait till the digest is done
             setTimeout(() => {
                 this.tkFbSdk.ready.then(FB => {
@@ -64,7 +65,6 @@ class FbPlayer {
             this.playerErrorHandler.release();
             this.playerErrorHandler = undefined;
             this.error = undefined;
-            this.$element.empty();
         }
     }
 
@@ -83,5 +83,9 @@ export default {
         _width: "<width"
     },
     controller: FbPlayer,
-    controllerAs: "$fbPlayer"
+    controllerAs: "$fbPlayer",
+    template: `
+        <div class="video" ng-show="!$fbPlayer.error"></div>
+        <p class="error" ng-show="!!$fbPlayer.error" ng-bind="$fbPlayer.error"></p>
+    `
 };
