@@ -3,10 +3,15 @@ import { element } from "angular";
 class YTPlayer {
     static get $inject() { return ["$scope", "$element", "$q", "tkYouTubeIframeApi"]; }
     constructor($scope, $element, $q, tkYouTubeIframeApi) {
+        this.$scope = $scope;
         this.$element = $element;
         this.$q = $q;
         this.tkYouTubeIframeApi = tkYouTubeIframeApi;
         this.playerId = `tk-yt-player-${$scope.$id}`;
+    }
+
+    $onInit() {
+        this.$scope.$on("tk-yt-player:stop", this.stop.bind(this));
     }
 
     $onChanges({ videoId }) {
@@ -35,7 +40,7 @@ class YTPlayer {
                 videoId,
                 events: {
                     onReady: () => { readyDeferred.resolve(); },
-                    onError: event => { this.errorCode = event.data; }
+                    onError: event => { this.$scope.$applyAsync(() => { this.errorCode = event.data; }) }
                 }
             });
             return readyDeferred.promise;
@@ -47,6 +52,12 @@ class YTPlayer {
             this.player.destroy();
             this.player = null;
             this.errorCode = undefined;
+        }
+    }
+
+    stop() {
+        if (this.player) {
+            this.player.pauseVideo();
         }
     }
 }

@@ -3,6 +3,7 @@ const MIN_WIDTH = 480;
 class VideoPlayer {
     static get $inject() { return ["$scope", "$element", "$sce"]; }
     constructor($scope, $element, $sce) {
+        this.$scope = $scope;
         this.$sce = $sce;
         this.$video = $element[0].querySelector("video");
         this.onVideoError = () => { $scope.$applyAsync() };
@@ -10,6 +11,7 @@ class VideoPlayer {
 
     $onInit() {
         this.$video.addEventListener("error", this.onVideoError);
+        this.$scope.$on("tk-video-player:stop", this.stop.bind(this));
     }
 
     $onChanges({ src, _width }) {
@@ -25,6 +27,10 @@ class VideoPlayer {
 
     $onDestroy() {
         this.$video.removeEventListener("error", this.onVideoError);
+    }
+
+    stop() {
+        this.$video.pause();
     }
 }
 

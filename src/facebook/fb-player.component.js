@@ -5,6 +5,7 @@ const MIN_WIDTH = 480;
 class FbPlayer {
     static get $inject() { return ["$scope", "$element", "$document", "$q", "tkFbSdk"]; }
     constructor($scope, $element, $document, $q, tkFbSdk) {
+        this.$scope = $scope;
         this.$element = $element;
         this.$document = $document;
         this.$q = $q;
@@ -15,6 +16,7 @@ class FbPlayer {
     }
 
     $onInit() {
+        this.$scope.$on("tk-fb-player:stop", this.stop.bind(this));
         this.tkFbSdk.ready.then(FB => {
             FB.Event.subscribe("xfbml.ready", this.handlePlayerInstance);
         });
@@ -66,15 +68,23 @@ class FbPlayer {
         if (this.playerErrorHandler) {
             this.playerErrorHandler.release();
             this.playerErrorHandler = undefined;
+            this.player = undefined;
             this.error = undefined;
         }
     }
 
     handlePlayerInstance(msg) {
         if (msg.type === "video" && msg.id === this.playerId) {
+            this.player = msg.instance;
             this.playerErrorHandler = msg.instance.subscribe("error", err => {
-                this.error = err;
+                this.$scope.$applyAsync(() => { this.error = err; });
             });
+        }
+    }
+
+    stop() {
+        if (this.player) {
+            this.player.pause();
         }
     }
 }
