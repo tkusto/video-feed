@@ -35332,12 +35332,12 @@ function videoViewsCountFilter() {
 
 function fitToRange(num) {
     var range = RANGES.reduce(function (result, range) {
-        return num > range.base ? range : result;
+        return num >= range.base ? range : result;
     }, undefined);
     if (range) {
         var integer = Math.floor(num / range.base);
-        var fraction = Math.round((num - integer * range.base) / range.base * 10);
-        return fraction > 0 ? integer + '.' + fraction + range.suffix : '' + integer + range.suffix;
+        var fraction = Math.round(num % range.base / range.base * 10);
+        return fraction > 0 ? fraction < 10 ? integer + '.' + fraction + range.suffix : fitToRange((integer + 1) * range.base) : '' + integer + range.suffix;
     } else {
         return num.toString(10);
     }

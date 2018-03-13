@@ -11,11 +11,15 @@ export default function videoViewsCountFilter() {
 }
 
 function fitToRange(num) {
-    const range = RANGES.reduce((result, range) => num > range.base ? range : result, undefined);
+    const range = RANGES.reduce((result, range) => num >= range.base ? range : result, undefined);
     if (range) {
         const integer = Math.floor(num / range.base);
-        const fraction = Math.round((num - integer * range.base) / range.base * 10);
-        return fraction > 0 ? `${integer}.${fraction}${range.suffix}` : `${integer}${range.suffix}`;
+        const fraction = Math.round((num % range.base) / range.base * 10);
+        return fraction > 0 ?
+            (fraction < 10 ?
+                `${integer}.${fraction}${range.suffix}`:
+                fitToRange((integer + 1) * range.base)):
+            `${integer}${range.suffix}`;
     } else {
         return num.toString(10);
     }
