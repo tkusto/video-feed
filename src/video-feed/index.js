@@ -4,9 +4,9 @@ import tkYouTube from "../youtube";
 import tkFacebook from "../facebook";
 import tkHtml5Media from "../html5-media";
 // module items
-import videoFeed from "./video-feed";
-import videoFeedItem from "./video-feed-item";
-import videoViewsCount from './video-views-count';
+import videoFeed from "./video-feed.component";
+import videoFeedItem from "./video-feed-item.component";
+import videoViewsCount from './video-views-count.filter';
 
 const MODULE_NAME = "tk.VideoFeed";
 export default MODULE_NAME;
